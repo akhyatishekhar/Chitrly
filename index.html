@@ -144,6 +144,12 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
+        }
+
+        .hero-submit:disabled {
+            background: var(--ink3);
+            cursor: not-allowed;
         }
 
         /* ══════ THE "WHY" SECTION ══════ */
@@ -226,8 +232,24 @@
         .cta h2 { font-family: 'Fraunces', serif; font-size: 48px; margin-bottom: 20px; }
         .cta p { color: rgba(255,255,255,0.7); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
+        /* ══════ ADMIN DASHBOARD (Hidden by default) ══════ */
+        #admin-panel {
+            display: none;
+            background: var(--white);
+            border-top: 2px solid var(--orange);
+            padding: 40px 0;
+            position: relative;
+            z-index: 200;
+        }
+        .admin-table-wrap { overflow-x: auto; margin-top: 20px; }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .admin-table th, .admin-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--rule); }
+        .admin-table th { background: var(--bg); font-weight: 700; }
+        .admin-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
         footer { padding: 40px 0; border-top: 1px solid var(--rule); }
         .foot-in { display: flex; justify-content: space-between; align-items: center; }
+        
         .success-msg { display: none; color: var(--orange-dark); font-weight: 600; padding-top: 24px; font-size: 18px; }
         .cta .success-msg { color: white; }
 
@@ -260,11 +282,34 @@
             <p class="hero-sub">Just got back from the city with new stock? Don't wait. Snap a photo and generate a professional festive banner for your neighbors in minutes.</p>
             
             <div id="hero-form-box">
-                <div class="hero-form">
-                    <input type="email" class="hero-input" placeholder="Your best email" id="hero-email">
-                    <button class="hero-submit" onclick="submitForm('hero')">Sign Up Free</button>
-                </div>
+                <form class="hero-form" id="hero-submit-form">
+                    <input type="email" class="hero-input" placeholder="Your best email" id="hero-email" required>
+                    <button type="submit" class="hero-submit" id="hero-submit-btn">Sign Up Free</button>
+                </form>
                 <div class="success-msg" id="hero-success">🎉 Welcome to Chitrly! We'll reach out with your link soon.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMIN DASHBOARD SECTION -->
+    <section id="admin-panel">
+        <div class="wrap">
+            <div class="admin-controls">
+                <h2 style="font-family: 'Fraunces', serif;">Leads Dashboard</h2>
+                <button class="nav-btn" id="export-csv">Download CSV</button>
+            </div>
+            <div id="admin-status">Loading leads...</div>
+            <div class="admin-table-wrap">
+                <table class="admin-table" id="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Source</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leads-body"></tbody>
+                </table>
             </div>
         </div>
     </section>
@@ -302,10 +347,12 @@
                     <p>By the time a designer sends you a banner, the festive rush is already over. You need to post <span>today</span>, not next week.</p>
                 </div>
                 <div class="prob-card rv">
+                    <span class="prob-card-icon">🏃</span>
                     <h4>The "Big Town" Hustle</h4>
                     <p>You've already put in the work traveling and buying. Marketing shouldn't feel like another full-time job.</p>
                 </div>
                 <div class="prob-card rv">
+                    <span class="prob-card-icon">🤝</span>
                     <h4>Generic Doesn't Feel Local</h4>
                     <p>Online templates often feel too "corporate." Chitrly gives you that local, warm, festive vibe your customers trust.</p>
                 </div>
@@ -385,10 +432,10 @@
                 <h2>Help us build Chitrly.</h2>
                 <p>We're in the early stages (0 to 1) and we need your feedback. Sign up, try the app, and let us know if it helps you sell more. No fancy promises—just a tool built for you.</p>
                 <div id="cta-form-box">
-                    <div class="hero-form" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;">
-                        <input type="email" class="hero-input" style="color: white;" placeholder="Your WhatsApp email" id="cta-email">
-                        <button class="hero-submit" style="background: white; color: var(--ink);" onclick="submitForm('cta')">Join Private Beta</button>
-                    </div>
+                    <form class="hero-form" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" id="cta-submit-form">
+                        <input type="email" class="hero-input" style="color: white;" placeholder="Your WhatsApp email" id="cta-email" required>
+                        <button type="submit" class="hero-submit" id="cta-submit-btn">Join Private Beta</button>
+                    </form>
                     <div class="success-msg" id="cta-success">🎉 Thank you for the trust! Check your email soon.</div>
                 </div>
             </div>
@@ -402,27 +449,168 @@
         </div>
     </footer>
 
-    <script>
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('on');
-            });
-        }, { threshold: 0.1 });
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        document.querySelectorAll('.rv').forEach(el => observer.observe(el));
+      // Global variables provided by environment
+      const firebaseConfig = JSON.parse(__firebase_config);
+      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+      const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        function submitForm(type) {
-            const input = document.getElementById(type + '-email');
-            if (input.value.length > 4 && input.value.includes('@')) {
-                document.querySelector('#' + type + '-form-box .hero-form').style.display = 'none';
-                document.getElementById(type + '-success').style.display = 'block';
-                
-                const other = type === 'hero' ? 'cta' : 'hero';
-                const otherForm = document.querySelector('#' + other + '-form-box .hero-form');
-                if (otherForm) otherForm.style.display = 'none';
-                document.getElementById(other + '-success').style.display = 'block';
-            }
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      let currentUser = null;
+      let collectedLeads = [];
+
+      // Authentication
+      const initAuth = async () => {
+        try {
+          if (authToken) {
+            await signInWithCustomToken(auth, authToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (error) {
+          console.error("Auth error:", error);
         }
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if (user && window.location.search.includes('admin=true')) {
+          showAdminPanel();
+        }
+      });
+
+      initAuth();
+
+      // Form Collection Logic
+      const submitEmail = async (email, type) => {
+        if (!currentUser) await initAuth();
+        if (!currentUser) return false;
+
+        try {
+          const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+          await addDoc(leadsRef, {
+            email: email,
+            source: type,
+            timestamp: serverTimestamp(),
+            userAgent: navigator.userAgent
+          });
+          return true;
+        } catch (error) {
+          console.error("Submission error:", error);
+          return false;
+        }
+      };
+
+      // Admin Dashboard Logic
+      const showAdminPanel = async () => {
+        const panel = document.getElementById('admin-panel');
+        const status = document.getElementById('admin-status');
+        const body = document.getElementById('leads-body');
+        
+        panel.style.display = 'block';
+        
+        try {
+          // Rule 2: Simple query to fetch all leads, then sort in memory
+          const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+          const querySnapshot = await getDocs(leadsRef);
+          
+          collectedLeads = [];
+          querySnapshot.forEach((doc) => {
+            collectedLeads.push(doc.data());
+          });
+
+          // Sort by timestamp (newest first)
+          collectedLeads.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+          if (collectedLeads.length === 0) {
+            status.textContent = 'No leads collected yet.';
+          } else {
+            status.textContent = `Showing ${collectedLeads.length} leads.`;
+            body.innerHTML = collectedLeads.map(lead => `
+              <tr>
+                <td>${lead.email}</td>
+                <td><span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px;">${lead.source}</span></td>
+                <td>${lead.timestamp ? new Date(lead.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+              </tr>
+            `).join('');
+          }
+        } catch (error) {
+          console.error("Admin error:", error);
+          status.textContent = 'Error loading leads. Ensure you have permissions.';
+        }
+      };
+
+      // Export CSV Logic
+      document.getElementById('export-csv').addEventListener('click', () => {
+        if (collectedLeads.length === 0) return;
+        
+        const headers = ['Email', 'Source', 'Date'];
+        const rows = collectedLeads.map(l => [
+          l.email, 
+          l.source, 
+          l.timestamp ? new Date(l.timestamp.seconds * 1000).toISOString() : ''
+        ]);
+        
+        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `chitrly_leads_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      // Form UI Setup
+      const setupForm = (type) => {
+        const form = document.getElementById(type + '-submit-form');
+        const btn = document.getElementById(type + '-submit-btn');
+        const success = document.getElementById(type + '-success');
+        const input = document.getElementById(type + '-email');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = input.value;
+          btn.disabled = true;
+          btn.textContent = 'Saving...';
+
+          const ok = await submitEmail(email, type);
+
+          if (ok) {
+            form.style.display = 'none';
+            success.style.display = 'block';
+            const otherType = type === 'hero' ? 'cta' : 'hero';
+            const otherForm = document.getElementById(otherType + '-submit-form');
+            const otherSuccess = document.getElementById(otherType + '-success');
+            if (otherForm) otherForm.style.display = 'none';
+            if (otherSuccess) otherSuccess.style.display = 'block';
+          } else {
+            btn.disabled = false;
+            btn.textContent = 'Try Again';
+          }
+        });
+      };
+
+      setupForm('hero');
+      setupForm('cta');
+
+      // Scroll reveal
+      const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+              if (entry.isIntersecting) entry.target.classList.add('on');
+          });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.rv').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
