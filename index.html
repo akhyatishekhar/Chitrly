@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chitrly - Build Your Local Shop's Brand</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #FAFAF8;
+            --white: #FFFFFF;
+            --ink: #1A1A1A;
+            --ink2: #555555;
+            --ink3: #B0A89E;
+            --rule: #E8E6E2;
+            --orange: #E8622E;
+            --orange-dark: #D4571F;
+            --orange-light: #FFF5EC;
+            --orange-glow: rgba(232, 98, 46, 0.15);
+            --radius: 16px;
+            --radius-lg: 24px;
+            --radius-pill: 100px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .rv {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        .rv.on { opacity: 1; transform: translateY(0); }
+
+        .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+        /* ══════ NAV ══════ */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 18px 0;
+            background: rgba(250, 250, 248, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .nav-in { display: flex; align-items: center; justify-content: space-between; }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ink);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--orange); }
+
+        .nav-links { display: flex; align-items: center; gap: 24px; }
+        .nav-a { font-size: 14px; font-weight: 500; color: var(--ink2); text-decoration: none; transition: color 0.2s; }
+        .nav-a:hover { color: var(--orange); }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--orange);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px var(--orange-glow);
+        }
+
+        /* ══════ HERO ══════ */
+        .hero {
+            padding: 160px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 60px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            color: var(--ink);
+            margin-bottom: 24px;
+        }
+
+        .hero h1 span { color: var(--orange); }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--ink2);
+            line-height: 1.6;
+            max-width: 660px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-form {
+            display: flex;
+            background: var(--white);
+            border-radius: var(--radius-pill);
+            padding: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05), 0 0 0 1px var(--rule);
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        .hero-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .hero-submit {
+            padding: 14px 28px;
+            background: var(--orange);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* ══════ THE "WHY" SECTION ══════ */
+        .story-sec { padding: 80px 0; background: #FDFDFB; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+        .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .story-content h2 { font-family: 'Fraunces', serif; font-size: 36px; margin-bottom: 20px; }
+        .story-content p { color: var(--ink2); font-size: 16px; line-height: 1.7; margin-bottom: 24px; }
+
+        /* ══════ PROBLEMS ══════ */
+        .problem-sec { padding: 100px 0; background: var(--white); }
+        .sec-header { text-align: center; margin-bottom: 60px; }
+        .sec-header h2 { font-family: 'Fraunces', serif; font-size: 40px; margin-bottom: 12px; }
+        
+        .prob-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .prob-card {
+            padding: 40px 32px;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+        .prob-card:hover { border-color: var(--orange); background: var(--white); transform: translateY(-5px); }
+        .prob-card-icon { font-size: 32px; margin-bottom: 20px; display: block; }
+        .prob-card h4 { font-family: 'Fraunces', serif; font-size: 20px; margin-bottom: 12px; }
+        .prob-card p { font-size: 15px; color: var(--ink2); line-height: 1.6; }
+
+        /* ══════ HOW IT WORKS ══════ */
+        .how-sec { padding: 100px 0; background: #FAF9F6; }
+        .how-grid { display: grid; grid-template-columns: 1fr 400px; gap: 80px; align-items: center; }
+        .step-list { display: flex; flex-direction: column; gap: 40px; }
+        .step { display: flex; gap: 24px; align-items: flex-start; }
+        .step-num {
+            width: 44px; height: 44px;
+            background: var(--ink);
+            color: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+        .step-content h3 { font-family: 'Fraunces', serif; font-size: 24px; margin-bottom: 8px; }
+        .step-content p { color: var(--ink2); line-height: 1.6; font-size: 16px; }
+
+        /* App Mock */
+        .app-wireframe {
+            background: var(--white);
+            border: 10px solid var(--ink);
+            border-radius: 48px;
+            height: 700px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.12);
+        }
+        .app-header { padding: 24px 20px; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; }
+        .app-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 20px; }
+        .app-logo span { color: var(--orange); }
+        .app-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+        .app-section-h { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--ink3); letter-spacing: 1.2px; margin-bottom: 6px; }
+        .app-upload { border: 2px dashed var(--rule); border-radius: 16px; padding: 30px; text-align: center; background: var(--bg); color: var(--ink2); font-weight: 600; font-size: 13px; }
+        .app-select { padding: 12px 16px; border: 1.5px solid var(--rule); border-radius: 12px; font-size: 14px; display: flex; justify-content: space-between; font-weight: 500; }
+        .app-btn { background: var(--orange); color: white; padding: 14px; border-radius: 14px; border: none; font-weight: 700; font-size: 14px; margin-top: 10px; }
+        .app-preview-box { border-radius: 16px; background: var(--orange-light); aspect-ratio: 16/10; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(232, 98, 46, 0.1); }
+        .app-preview-box h4 { font-family: 'Fraunces', serif; color: var(--orange-dark); font-size: 20px; }
+
+        /* ══════ CTA ══════ */
+        .cta { padding: 100px 0; }
+        .cta-inner {
+            background: var(--ink);
+            border-radius: 40px;
+            padding: 100px 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta h2 { font-family: 'Fraunces', serif; font-size: 48px; margin-bottom: 20px; }
+        .cta p { color: rgba(255,255,255,0.7); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+
+        footer { padding: 40px 0; border-top: 1px solid var(--rule); }
+        .foot-in { display: flex; justify-content: space-between; align-items: center; }
+        .success-msg { display: none; color: var(--orange-dark); font-weight: 600; padding-top: 24px; font-size: 18px; }
+        .cta .success-msg { color: white; }
+
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 44px; }
+            .story-grid { grid-template-columns: 1fr; }
+            .prob-grid { grid-template-columns: 1fr; }
+            .how-grid { grid-template-columns: 1fr; gap: 60px; }
+            .app-wireframe { max-width: 340px; margin: 0 auto; }
+            .cta h2 { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav">
+        <div class="wrap nav-in">
+            <a class="logo" href="#">Chitr<span>ly</span></a>
+            <div class="nav-links">
+                <a class="nav-a" href="#audience">Who it's for</a>
+                <a class="nav-a" href="#problem">The Problem</a>
+                <button class="nav-btn" onclick="document.getElementById('join').scrollIntoView()">Try the App</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="wrap">
+            <h1>You handle the stock.<br>We handle the <span>selling.</span></h1>
+            <p class="hero-sub">Just got back from the city with new stock? Don't wait. Snap a photo and generate a professional festive banner for your neighbors in minutes.</p>
+            
+            <div id="hero-form-box">
+                <div class="hero-form">
+                    <input type="email" class="hero-input" placeholder="Your best email" id="hero-email">
+                    <button class="hero-submit" onclick="submitForm('hero')">Sign Up Free</button>
+                </div>
+                <div class="success-msg" id="hero-success">🎉 Welcome to Chitrly! We'll reach out with your link soon.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-sec" id="audience">
+        <div class="wrap story-grid">
+            <div class="story-content rv">
+                <div style="color: var(--orange); font-weight: 700; font-size: 13px; margin-bottom: 12px; letter-spacing: 1px;">FOR LOCAL ENTREPRENEURS</div>
+                <h2>Built for the <span>Shop Owner</span> who does it all.</h2>
+                <p>We know how it goes. You travel to the big town, spend hours picking the best sarees and suits, and bring them back to your shop. Your neighbors and regular customers are waiting.</p>
+                <p>But when it comes to showing them what's new, you're stuck sending blurry photos or waiting for a designer who takes forever. Chitrly changes that.</p>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--orange-light); display: flex; align-items: center; justify-content: center; font-size: 20px;">🤳</div>
+                    <div style="font-weight: 600;">Sell faster on WhatsApp Stories & Groups.</div>
+                </div>
+            </div>
+            <div class="story-visual rv" style="background: var(--white); border: 1px solid var(--rule); border-radius: 32px; padding: 40px; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700;">"New Stock Just Arrived"</div>
+                <div style="color: var(--ink3); margin-top: 10px; font-style: italic;">The best time to sell is right now.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="problem-sec" id="problem">
+        <div class="wrap">
+            <div class="sec-header rv">
+                <h2>Why we built Chitrly</h2>
+                <p>Marketing shouldn't be the hardest part of your day.</p>
+            </div>
+            <div class="prob-grid">
+                <div class="prob-card rv">
+                    <span class="prob-card-icon">⌛</span>
+                    <h4>The Designer Bottleneck</h4>
+                    <p>By the time a designer sends you a banner, the festive rush is already over. You need to post <span>today</span>, not next week.</p>
+                </div>
+                <div class="prob-card rv">
+                    <h4>The "Big Town" Hustle</h4>
+                    <p>You've already put in the work traveling and buying. Marketing shouldn't feel like another full-time job.</p>
+                </div>
+                <div class="prob-card rv">
+                    <h4>Generic Doesn't Feel Local</h4>
+                    <p>Online templates often feel too "corporate." Chitrly gives you that local, warm, festive vibe your customers trust.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-sec" id="how">
+        <div class="wrap how-grid">
+            <div class="step-list">
+                <div class="sec-header" style="text-align: left; margin-bottom: 20px;">
+                    <h2 style="font-size: 42px;">Your new marketing<br>workflow.</h2>
+                </div>
+                
+                <div class="step rv">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h3>Take a Photo</h3>
+                        <p>No studio needed. Just a clear photo of your garment on a hanger or a table. Chitrly handles the rest.</p>
+                    </div>
+                </div>
+
+                <div class="step rv">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h3>Pick the Festive Vibe</h3>
+                        <p>Select Durga Puja, Diwali, Eid, or any local occasion. We auto-generate the perfect background and text.</p>
+                    </div>
+                </div>
+
+                <div class="step rv">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h3>Post to WhatsApp</h3>
+                        <p>One tap to save and share. Your regular customers see the new stock and reach out immediately.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-wireframe rv">
+                <div class="app-header">
+                    <div class="app-logo">Chitr<span>ly</span></div>
+                    <div style="font-size: 14px; color: var(--ink3);">Beta v0.1</div>
+                </div>
+                <div class="app-body">
+                    <div>
+                        <div class="app-section-h">Current Stock</div>
+                        <div class="app-upload">👕 TAP TO UPLOAD GARMENT</div>
+                    </div>
+                    <div>
+                        <div class="app-section-h">Select Occasion</div>
+                        <div class="app-select"><span>Durga Puja</span><span>▼</span></div>
+                    </div>
+                    <div>
+                        <div class="app-section-h">Story Format</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="flex: 1; padding: 10px; border: 1.5px solid var(--ink); border-radius: 10px; font-size: 12px; text-align: center; background: var(--ink); color: white;">Vertical</div>
+                            <div style="flex: 1; padding: 10px; border: 1.5px solid var(--rule); border-radius: 10px; font-size: 12px; text-align: center;">Square</div>
+                        </div>
+                    </div>
+                    <button class="app-btn">Generate Festive Banner</button>
+                    <div style="margin-top: 5px;">
+                        <div class="app-section-h">Live Preview</div>
+                        <div class="app-preview-box">
+                            <h4 style="margin-bottom: 4px;">Durga Puja</h4>
+                            <div style="font-size: 10px; opacity: 0.7;">SHUBHO SHARODIYA!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="join">
+        <div class="wrap">
+            <div class="cta-inner rv">
+                <h2>Help us build Chitrly.</h2>
+                <p>We're in the early stages (0 to 1) and we need your feedback. Sign up, try the app, and let us know if it helps you sell more. No fancy promises—just a tool built for you.</p>
+                <div id="cta-form-box">
+                    <div class="hero-form" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;">
+                        <input type="email" class="hero-input" style="color: white;" placeholder="Your WhatsApp email" id="cta-email">
+                        <button class="hero-submit" style="background: white; color: var(--ink);" onclick="submitForm('cta')">Join Private Beta</button>
+                    </div>
+                    <div class="success-msg" id="cta-success">🎉 Thank you for the trust! Check your email soon.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="wrap foot-in">
+            <div class="logo">Chitr<span>ly</span></div>
+            <div style="font-size: 13px; color: var(--ink3);">Built for the local shop owner. Grow with us.</div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('on');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.rv').forEach(el => observer.observe(el));
+
+        function submitForm(type) {
+            const input = document.getElementById(type + '-email');
+            if (input.value.length > 4 && input.value.includes('@')) {
+                document.querySelector('#' + type + '-form-box .hero-form').style.display = 'none';
+                document.getElementById(type + '-success').style.display = 'block';
+                
+                const other = type === 'hero' ? 'cta' : 'hero';
+                const otherForm = document.querySelector('#' + other + '-form-box .hero-form');
+                if (otherForm) otherForm.style.display = 'none';
+                document.getElementById(other + '-success').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
