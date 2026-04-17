@@ -146,6 +146,11 @@
             transition: all 0.2s;
         }
 
+        .hero-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* ══════ PROBLEMS SECTION ══════ */
         .problem-sec { padding: 80px 0; background: #FDFDFB; border-top: 1px solid var(--rule); }
         .sec-header { text-align: center; margin-bottom: 50px; }
@@ -223,8 +228,23 @@
 
         footer { padding: 40px 0; border-top: 1px solid var(--rule); }
         .foot-in { display: flex; justify-content: space-between; align-items: center; }
-        .success-msg { display: none; color: var(--orange-dark); font-weight: 600; padding-top: 20px; }
+
+        .success-msg {
+            display: none;
+            color: var(--orange-dark);
+            font-weight: 600;
+            padding-top: 20px;
+        }
         .cta .success-msg { color: white; }
+
+        .error-msg {
+            display: none;
+            color: #c0392b;
+            font-weight: 500;
+            font-size: 14px;
+            padding-top: 12px;
+        }
+        .cta .error-msg { color: #ff6b6b; }
 
         @media (max-width: 900px) {
             .hero h1 { font-size: 40px; }
@@ -253,11 +273,14 @@
             <p class="hero-sub">The easiest way for local shop owners to create professional marketing graphics for WhatsApp groups and Social Media.</p>
             
             <div id="hero-form-box">
-                <div class="hero-form">
-                    <input type="email" class="hero-input" placeholder="Enter your email" id="hero-email">
-                    <button class="hero-submit" onclick="submitForm('hero')">Get Access</button>
-                </div>
+                <form class="hero-form" id="hero-form" action="https://formspree.io/f/xlgabwpa" method="POST">
+                    <input type="email" class="hero-input" placeholder="Enter your email" name="email" required>
+                    <input type="hidden" name="_gotcha" style="display:none">
+                    <input type="hidden" name="_source" value="hero">
+                    <button type="submit" class="hero-submit">Get Access</button>
+                </form>
                 <div class="success-msg" id="hero-success">🎉 Welcome! We'll invite you to the beta shortly.</div>
+                <div class="error-msg" id="hero-error">Something went wrong. Please try again.</div>
             </div>
         </div>
     </section>
@@ -357,11 +380,14 @@
                 <h2>Help us build Chitrly.</h2>
                 <p>We are in the early stage (0-1) and looking for shop owners to test the app and share feedback. Sign up to get the early link.</p>
                 <div id="cta-form-box">
-                    <div class="hero-form" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;">
-                        <input type="email" class="hero-input" style="color: white;" placeholder="Your email address" id="cta-email">
-                        <button class="hero-submit" style="background: white; color: var(--ink);" onclick="submitForm('cta')">Join Beta</button>
-                    </div>
+                    <form class="hero-form" id="cta-form" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;" action="https://formspree.io/f/xlgabwpa" method="POST">
+                        <input type="email" class="hero-input" style="color: white;" placeholder="Your email address" name="email" required>
+                        <input type="hidden" name="_gotcha" style="display:none">
+                        <input type="hidden" name="_source" value="cta">
+                        <button type="submit" class="hero-submit" style="background: white; color: var(--ink);">Join Beta</button>
+                    </form>
                     <div class="success-msg" id="cta-success">🎉 We've added you! Check your email soon.</div>
+                    <div class="error-msg" id="cta-error">Something went wrong. Please try again.</div>
                 </div>
             </div>
         </div>
@@ -375,26 +401,54 @@
     </footer>
 
     <script>
+        // Scroll reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('on');
             });
         }, { threshold: 0.1 });
-
         document.querySelectorAll('.rv').forEach(el => observer.observe(el));
 
-        function submitForm(type) {
-            const input = document.getElementById(type + '-email');
-            if (input.value.length > 4 && input.value.includes('@')) {
-                document.querySelector('#' + type + '-form-box .hero-form').style.display = 'none';
-                document.getElementById(type + '-success').style.display = 'block';
-                
-                const other = type === 'hero' ? 'cta' : 'hero';
-                const otherForm = document.querySelector('#' + other + '-form-box .hero-form');
-                if (otherForm) otherForm.style.display = 'none';
-                document.getElementById(other + '-success').style.display = 'block';
-            }
-        }
+        // Formspree submission via fetch (AJAX)
+        document.querySelectorAll('#hero-form, #cta-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const type = this.id === 'hero-form' ? 'hero' : 'cta';
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.textContent;
+
+                // Disable button while submitting
+                btn.disabled = true;
+                btn.textContent = 'Sending…';
+
+                try {
+                    const response = await fetch('https://formspree.io/f/xlgabwpa', {
+                        method: 'POST',
+                        body: new FormData(this),
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (response.ok) {
+                        // Hide both forms, show both success messages
+                        document.getElementById('hero-form').style.display = 'none';
+                        document.getElementById('cta-form').style.display = 'none';
+                        document.getElementById('hero-success').style.display = 'block';
+                        document.getElementById('cta-success').style.display = 'block';
+                        document.getElementById('hero-error').style.display = 'none';
+                        document.getElementById('cta-error').style.display = 'none';
+                    } else {
+                        document.getElementById(type + '-error').style.display = 'block';
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                    }
+                } catch (err) {
+                    document.getElementById(type + '-error').style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            });
+        });
     </script>
 </body>
 </html>
